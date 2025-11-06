@@ -1,0 +1,16 @@
+# 构建目录
+/build/
+# 编译缓存
+.vscode/
+*.swp
+*.swo
+
+# macOS
+.DS_Store
+
+# 日志（可选）
+logs/
+
+# ctp
+*.con
+flow
