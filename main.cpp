@@ -2,6 +2,7 @@
 #include <string>
 #include <sstream>
 #include "DataCollect.h"
+#include "base64.h"
 
 // 解析错误码的函数
 std::string parseErrorCode(int errorCode) {
@@ -37,8 +38,18 @@ int main() {
 
     if (result == 0) {
         std::cout << "系统信息采集成功!" << std::endl;
-        std::cout << "采集到的数据长度: " << len << " 字节" << std::endl;
-        std::cout << "系统信息: " << std::string(buffer, len) << std::endl;
+        std::cout << "原始数据长度: " << len << " 字节" << std::endl;
+        
+        // 将原始数据进行Base64编码
+        std::string raw_data(buffer, len);
+        std::string encoded_data = base64_encode(reinterpret_cast<const unsigned char*>(raw_data.c_str()), raw_data.length());
+        
+        std::cout << "Base64编码后的数据:" << std::endl;
+        std::cout << encoded_data << std::endl;
+        
+        // 如果需要，也可以解码验证
+        // std::string decoded_data = base64_decode(encoded_data);
+        // std::cout << "解码后长度: " << decoded_data.length() << " 字节" << std::endl;
     } else {
         std::cout << "系统信息采集失败!" << std::endl;
         std::cout << parseErrorCode(result) << std::endl;

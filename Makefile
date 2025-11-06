@@ -1,27 +1,37 @@
+# 编译器和编译选项
 CXX = g++
 CXXFLAGS = -std=c++11 -Wall -Wextra
 LDFLAGS = -L. -l:LinuxDataCollect.so
 
-# 目标文件
+# 目标文件名称
 TARGET = data_collector
-SRC = main.cpp
+SRCS = main.cpp base64.cpp
 
-$(TARGET): $(SRC) DataCollect.h
-	$(CXX) $(CXXFLAGS) -o $(TARGET) $(SRC) $(LDFLAGS)
+# 默认目标
+all: $(TARGET)
 
-# 创建符号链接版本
-$(TARGET)_symlink:
+# 编译目标 - 添加RPATH
+$(TARGET): $(SRCS) DataCollect.h base64.h
+	$(CXX) $(CXXFLAGS) -o $(TARGET) $(SRCS) $(LDFLAGS) -Wl,-rpath,.
+
+# 创建符号链接版本（备选方案）
+symlink: 
 	ln -sf LinuxDataCollect.so libDataCollect.so
-	$(CXX) $(CXXFLAGS) -o $(TARGET) $(SRC) -L. -lDataCollect
+	$(CXX) $(CXXFLAGS) -o $(TARGET) $(SRCS) -L. -lDataCollect -Wl,-rpath,.
 
-install-libs:
-	# 将库文件复制到系统库目录（可选）
-	# sudo cp LinuxDataCollect.so /usr/lib/
-	# 或者复制到 /usr/local/lib/
-	# sudo cp LinuxDataCollect.so /usr/local/lib/
-	# sudo ldconfig
-
+# 清理编译产物
 clean:
 	rm -f $(TARGET) libDataCollect.so
 
-.PHONY: clean install-libs
+# 安装库到系统（可选）
+install-libs:
+	@echo "将库文件复制到系统库目录的示例命令："
+	@echo "sudo cp LinuxDataCollect.so /usr/lib/"
+	@echo "sudo ldconfig"
+
+# 显示依赖信息
+show-deps:
+	@echo "检查可执行文件依赖："
+	@ldd $(TARGET) || echo "可执行文件 $(TARGET) 不存在，请先编译"
+
+.PHONY: all clean install-libs show-deps symlink
